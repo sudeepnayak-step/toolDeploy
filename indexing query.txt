@@ -1,0 +1,25 @@
+CREATE INDEX idx_tc_projectId ON s_testcase(projectId);
+CREATE INDEX idx_tc_releaseId ON s_testcase(releaseId);
+CREATE INDEX idx_tc_category ON s_testcase(s_t_category);
+CREATE INDEX idx_tc_assignto ON s_testcase(s_t_assignto);
+CREATE INDEX idx_tc_author ON s_testcase(s_t_author);
+CREATE INDEX idx_tc_reviewer ON s_testcase(s_t_reviewer);
+CREATE INDEX idx_tc_accountId ON s_testcase(accountId);
+
+CREATE INDEX idx_a2_userId ON s_employees(userId);  
+
+ 
+CREATE INDEX idx_testcaserun_testcaseId_accountId_stid   ON s_testcaserun (testcaseId, accountId, s_st_id DESC);
+CREATE INDEX idx_testcasefinal_testcaseId_accountId_result_updatetime 
+ON s_testcasefinal (testcaseId, accountId, s_f_testresult, s_f_updatetime DESC);
+CREATE INDEX idx_activitymaster_id_accountId 
+ON s_activitymaster (s_a_id, accountId);
+CREATE INDEX idx_chartsetting_tablename_enteredby_accountId_id 
+ON s_chartsetting (s_c_tablename, s_c_enteredby, accountId, s_c_id ASC);
+ 
+CREATE INDEX idx_s_fids 
+ON s_defect (accountId, projectId, releaseId, testcaseId, defectstatusId, defecttypeId, s_d_assignto, s_d_id DESC);
+CREATE INDEX idx_s_project_id_account_enteredby 
+ON s_project (s_p_id, accountId, s_p_enteredby);
+CREATE INDEX idx_s_project_members_project_employee 
+ON s_project_members (projectId, employeeId);
