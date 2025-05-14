@@ -1,0 +1,6 @@
+CREATE INDEX idx_s_project_id_account_enteredby ON s_project (s_p_id, accountId, s_p_enteredby);
+CREATE INDEX idx_s_project_members_project_employee ON s_project_members (projectId, employeeId);
+CREATE INDEX idx_defectstatusId ON s_defect(defectstatusId);
+CREATE INDEX idx_s_d_testdata ON s_defect(s_d_testdata);
+CREATE INDEX idx_s_d_severity ON s_defect(s_d_severity);
+alter table s_testsuite add s_ts_artifacts int default 0;
