@@ -1,0 +1,129 @@
+Follow below steps for grouping of user.
+
+1. Import attachd table and add groupId column in s_employee
+
+2. add below code in getDropdown.php
+
+	else if($formtype == "Group"){
+
+	   
+
+			$sqldata = mysqli_query($conn,"SELECT * from s_group where s_group_activestatus = 'Active' and accountId ='".$accountId."' ");
+
+	   
+
+			while($data = mysqli_fetch_assoc($sqldata)){
+
+				$mainarr['data'][] = array("id"=>$data['s_group_id'],
+
+					"name"=>$data['s_group_name']
+
+				);
+
+			}
+
+	}else if($formtype == "GroupwiseAssignee"){
+
+		$groupId = isset($_POST['groupId']) ? $_POST['groupId'] :"";
+		$sqldata = mysqli_query($conn,"SELECT * from  s_employees where s_e_activestatus = 'Active'  and groupId in ($groupId)  and accountId ='".$accountId."'   Order by s_e_id desc");
+
+		while($data = mysqli_fetch_assoc($sqldata)){
+			$mainarr['data'][] = array("id"=>$data['s_e_id'],
+				"name"=>$data['s_e_fname']." ".$data['s_e_mname']." ".$data['s_e_lname']
+			);
+		}
+	}
+	
+	
+3. open api/getSingleedit.php find     $formtype == "User" and add "groupId"=>$data['groupId'], in array
+
+4. api/addupdateuser.php   
+try to do the code for group  in a similar way based on role
+
+5. api/saveUser.php
+try to do the code for group  in a similar way based on role
+
+6. api/getallUsers.php
+ change the query 
+ 
+ $sqldata = mysqli_query($conn,"SELECT e.*,IFNULL(r.s_role_name,'') as role,IFNULL(g.s_group_name,'') as empgroup,IFNULL(e.s_e_accountstatus,'') as accountstatus from s_employees e 
+left join s_role r on r.s_role_id = e.roleId 
+left join s_group g on g.s_group_id = e.groupId  
+where   e.accountId ='".$accountId."'
+order by e.s_e_id desc");
+
+
+
+add $data['empgroup'] after $data['userId']
+
+7. master/user.php
+add <th>Group</th> after <th>User ID</th>
+
+
+add below dropdown in form
+
+
+                                            <div class="col-4">
+                                                <div class="form-group">
+                                                    <label for="groupId" class=" form-control-label">Group : </label>
+
+                                                    <select class="selectpicker form-control" id="groupId" name="groupId"  data-live-search="true" title="Select Group" data-hide-disabled="true" data-exist=""></select>
+                                                </div>
+                                            </div>
+											
+8. assets/js/init-scripts/master/user-init.js
+try to do the code for group  in a similar way based on role
+
+9. master/project.php
+
+add dropdown in form
+<div class="col-4">
+	<div class="form-group">
+		<label for="group" class=" form-control-label">Group : </label>
+
+		<select class="selectpicker form-control" multiple id="group" name="group[]"  data-live-search="true" title="Select group" data-hide-disabled="true"  data-actions-box="true" data-exist=""></select>
+		
+	</div>
+</div>	
+
+10. assets/js/init-scripts/master/project-init.js
+
+var pgroup = function(){
+  return new Promise(function(resolve, reject){
+      console.log('pgroup');
+      
+      $.ajax({
+                 type: "POST",
+                 url: STEP_root+'api/getDropdown.php',
+                 dataType:'json',
+                 data:  {'formtype':'Group'}, // serializes the form's elements.
+                 success: function(data)
+                 {
+                    if(data != null && data['data']!=null){
+                      $.each( data['data'], function( key, value ) {
+                        $("#group").append("<option value='"+value['id']+"' >"+value['name']+"</option>");
+                        filterOwneroption += "<option value='"+value['id']+"' >"+value['name']+"</option>";
+                      });
+                    }
+
+                   $("#group").selectpicker('refresh');
+                   resolve(true);
+                 },error:function (jqXHR, textStatus, errorThrown) {
+                   // reject(true);
+                   resolve(true);
+                        // formatErrorMessage(jqXHR, errorThrown);
+                       // console.log(textStatus+" // "+jqXHR+" // "+ errorThrown);
+                  }
+             });
+
+  });
+};
+
+
+
+p1().then(pgroup).then(p2).then(p3).then(function(){
+     // Hurray! All done!
+     console.log("All done :)");
+});
+
+add onchange event for group and bases on group selection get teammemeber.								
